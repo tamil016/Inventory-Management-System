@@ -5,6 +5,9 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
+const searchRoutes = require('./routes/searchRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+
 
 dotenv.config();
 connectDB();
@@ -24,6 +27,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/summary', dashboardRoutes);
 
 
 const path = require('path');
