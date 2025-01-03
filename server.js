@@ -5,7 +5,6 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
-const errorHandler = require('./utils/errorHandler');
 
 dotenv.config();
 connectDB();
@@ -30,8 +29,6 @@ app.use('/api/products', productRoutes);
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
-app.use(errorHandler);
 
 
 const PORT = process.env.PORT || 5000;
