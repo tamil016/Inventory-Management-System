@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+    getProduct,
     addProduct,
     updateProduct,
     deleteProduct,
@@ -10,6 +11,7 @@ const upload = require('../middlewares/uploadMiddleware');
 
 const router = express.Router();
 
+router.get('/', protect, getProduct)
 router.post('/', protect, upload.single('image'), addProduct);
 router.put('/:id', protect, upload.single('image'), updateProduct);
 router.delete('/:id', protect, deleteProduct);
