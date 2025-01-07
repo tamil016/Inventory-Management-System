@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Table, TableBody, TableCell, FormControl,
-TableContainer, TableHead, TableRow, Paper, Typography, Select, MenuItem,Pagination} from '@mui/material';
+import {
+  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Table, TableBody, TableCell, FormControl,
+  TableContainer, TableHead, TableRow, Paper, Typography, Select, MenuItem, Pagination
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ToastContainer, toast } from 'react-toastify';
@@ -19,6 +21,7 @@ const Products = () => {
   const [sortConfig, setSortConfig] = useState({ field: '', order: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showLowStock, setShowLowStock] = useState(false);
 
   const fetchProducts = async (resetPage = false) => {
     try {
@@ -28,6 +31,7 @@ const Products = () => {
         category: selectedCategory,
         sortBy: JSON.stringify(sortConfig),
         page: resetPage ? 1 : currentPage,
+        onlyLowStock: showLowStock,
       }).toString();
 
       const response = await fetch(`http://localhost:5000/api/search?${query}`, {
@@ -67,7 +71,7 @@ const Products = () => {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-  }, [searchQuery, selectedCategory, sortConfig, currentPage]);
+  }, [searchQuery, selectedCategory, sortConfig, currentPage, showLowStock]);
 
   const getCategoryNameById = (categoryId) => {
     const category = categories.find(cat => cat._id === categoryId._id);
@@ -138,7 +142,7 @@ const Products = () => {
     } catch (error) {
       toast.error('Error deleting product.');
     }
-  }; 
+  };
 
   const handleSort = (field) => {
     setSortConfig((prev) => ({
@@ -150,6 +154,8 @@ const Products = () => {
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
+  const toggleLowStock = () => setShowLowStock(!showLowStock);
+
 
   return (
     <Box sx={{ p: 3, maxWidth: '1000px', margin: '0 auto' }}>
@@ -179,7 +185,8 @@ const Products = () => {
           fullWidth
         />
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap:'20px' }}>
+        <Button variant="contained" color="primary" onClick={toggleLowStock}>{showLowStock ? 'View All Products' : 'View Low Stock'}</Button>
         <Button variant="contained" color="primary" onClick={() => handleDialogOpen()}>Add Product</Button>
       </Box>
       <TableContainer component={Paper} sx={{ mt: 3 }}>
@@ -200,23 +207,23 @@ const Products = () => {
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
-            <TableBody>
-              {products.map((product) => (
-                <TableRow key={product._id}>
-                  <TableCell>
-                    {product.image && <img src={`http://localhost:5000/uploads/${product.image}`} alt={product.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />}
-                  </TableCell>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>{getCategoryNameById(product.category)}</TableCell>
-                  <TableCell>{product.quantity}</TableCell>
-                  <TableCell>{product.price}</TableCell>
-                  <TableCell>
-                    <IconButton color="primary" onClick={() => handleDialogOpen({ id: product._id, name: product.name, category: product.category._id, quantity: product.quantity, price: product.price, description: product.description, image: null })}><EditIcon /></IconButton>
-                    <IconButton color="error" onClick={() => handleDeleteProduct(product._id)}><DeleteIcon /></IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+          <TableBody>
+            {products.map((product) => (
+              <TableRow key={product._id}>
+                <TableCell>
+                  {product.image && <img src={`http://localhost:5000/uploads/${product.image}`} alt={product.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />}
+                </TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{getCategoryNameById(product.category)}</TableCell>
+                <TableCell>{product.quantity}</TableCell>
+                <TableCell>{product.price}</TableCell>
+                <TableCell>
+                  <IconButton color="primary" onClick={() => handleDialogOpen({ id: product._id, name: product.name, category: product.category._id, quantity: product.quantity, price: product.price, description: product.description, image: null })}><EditIcon /></IconButton>
+                  <IconButton color="error" onClick={() => handleDeleteProduct(product._id)}><DeleteIcon /></IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
         </Table>
       </TableContainer>
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
