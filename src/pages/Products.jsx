@@ -154,8 +154,10 @@ const Products = () => {
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
-  const toggleLowStock = () => setShowLowStock(!showLowStock);
-
+  const toggleLowStock = () => {
+    setShowLowStock(!showLowStock);
+    setCurrentPage(1)
+  }
 
   return (
     <Box sx={{ p: 3, maxWidth: '1000px', margin: '0 auto' }}>
