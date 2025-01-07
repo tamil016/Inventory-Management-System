@@ -2,11 +2,12 @@ const Product = require('../models/Product');
 
 const searchProduct = async (req, res) => {
     try {
-        const { name, category, sortBy, page=1 } = req.query;
+        const { name, category, sortBy, page=1, onlyLowStock } = req.query;
 
         let filter = {};
         if (name) filter.name = new RegExp(name, 'i');
         if (category) filter.category = category;
+        if (onlyLowStock === 'true') filter.quantity = { $lt: 10 };
 
         let sortCriteria = {};
         if (sortBy) {
@@ -17,7 +18,7 @@ const searchProduct = async (req, res) => {
         } else {
             sortCriteria.name = 1;
         }
-        // console.log(sortCriteria);
+
         const limit = 6;
         const skip = (page - 1) * limit;
 
