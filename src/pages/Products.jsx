@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
-  TextField, IconButton, Table, TableBody, TableCell, FormControl,
-  TableContainer, TableHead, TableRow, Paper, Typography, Select, MenuItem
-} from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Table, TableBody, TableCell, FormControl,
+TableContainer, TableHead, TableRow, Paper, Typography, Select, MenuItem,Pagination} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ToastContainer, toast } from 'react-toastify';
@@ -19,23 +16,39 @@ const Products = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortConfig, setSortConfig] = useState({ field: '', order: '' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (resetPage = false) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/products`, {
+      if (resetPage) setCurrentPage(1);
+      const query = new URLSearchParams({
+        name: searchQuery,
+        category: selectedCategory,
+        sortBy: JSON.stringify(sortConfig),
+        page: resetPage ? 1 : currentPage,
+      }).toString();
+
+      const response = await fetch(`http://localhost:5000/api/search?${query}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
       const data = await response.json();
-      setProducts(data);
+      console.log(data);
+
+      setProducts(data.products);
+      setTotalPages(data.totalPages)
     } catch (error) {
       toast.error('Error fetching products.');
     }
   };
 
+  const handleFilterChange = () => {
+    fetchProducts(true)
+  };
   const fetchCategories = async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/categories`, {
@@ -54,10 +67,10 @@ const Products = () => {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-  }, []);
+  }, [searchQuery, selectedCategory, sortConfig, currentPage]);
 
   const getCategoryNameById = (categoryId) => {
-    const category = categories.find(cat => cat._id === categoryId);
+    const category = categories.find(cat => cat._id === categoryId._id);
     return category ? category.name : 'Unknown';
   };
 
@@ -100,7 +113,7 @@ const Products = () => {
         fetchProducts();
         handleDialogClose();
       } else {
-        toast.error('All fields are required.');
+        toast.error('All fields are required');
       }
     } catch (error) {
       toast.error('Error saving product.');
@@ -125,38 +138,29 @@ const Products = () => {
     } catch (error) {
       toast.error('Error deleting product.');
     }
+  }; 
+
+  const handleSort = (field) => {
+    setSortConfig((prev) => ({
+      field,
+      order: prev.field === field && prev.order === 'asc' ? 'desc' : 'asc'
+    }));
   };
 
-  const handleSortByPrice = () => {
-    const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-    setSortOrder(newSortOrder);
-
-    const sortedProducts = [...products].sort((a, b) => {
-      return newSortOrder === 'asc'
-        ? parseFloat(a.price) - parseFloat(b.price)
-        : parseFloat(b.price) - parseFloat(a.price);
-    });
-    setProducts(sortedProducts);
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
-
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    (selectedCategory ? product.category === selectedCategory : true)
-  );
 
   return (
     <Box sx={{ p: 3, maxWidth: '1000px', margin: '0 auto' }}>
       <Typography variant="h3" sx={{ textAlign: 'center', mb: 3 }}>Products</Typography>
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <TextField
-          label="Search Product"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          fullWidth
-        />
         <Select
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            handleFilterChange();
+          }}
           displayEmpty
           fullWidth
         >
@@ -165,44 +169,64 @@ const Products = () => {
             <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
           ))}
         </Select>
+        <TextField
+          label="Search Product"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            handleFilterChange();
+          }}
+          fullWidth
+        />
       </Box>
-      <Button variant="contained" color="primary" onClick={() => handleDialogOpen()}>Add Product</Button>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button variant="contained" color="primary" onClick={() => handleDialogOpen()}>Add Product</Button>
+      </Box>
       <TableContainer component={Paper} sx={{ mt: 3 }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>Image</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Category</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
-              <TableCell
-                sx={{ fontWeight: 'bold', cursor: 'pointer' }}
-                onClick={handleSortByPrice}
-              >
-                Price {sortOrder === 'asc' ? '↓' : '↑'}
+              <TableCell>Image</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>
+                Category
               </TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+              <TableCell onClick={() => handleSort('quantity')} style={{ cursor: 'pointer' }}>
+                Quantity {sortConfig.field === 'quantity' && (sortConfig.order === 'asc' ? '↑' : '↓')}
+              </TableCell>
+              <TableCell onClick={() => handleSort('price')} style={{ cursor: 'pointer' }}>
+                Price {sortConfig.field === 'price' && (sortConfig.order === 'asc' ? '↑' : '↓')}
+              </TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {filteredProducts.map(product => (
-              <TableRow key={product._id}>
-                <TableCell>
-                  {product.image && <img src={`http://localhost:5000/uploads/${product.image}`} alt={product.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />}
-                </TableCell>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>{getCategoryNameById(product.category)}</TableCell>
-                <TableCell>{product.quantity}</TableCell>
-                <TableCell>Rs {product.price}</TableCell>
-                <TableCell>
-                  <IconButton color="primary" onClick={() => handleDialogOpen({ id: product._id, name: product.name, category: product.category, quantity: product.quantity, price: product.price, description: product.description , image: null })}><EditIcon /></IconButton>
-                  <IconButton color="error" onClick={() => handleDeleteProduct(product._id)}><DeleteIcon /></IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+            <TableBody>
+              {products.map((product) => (
+                <TableRow key={product._id}>
+                  <TableCell>
+                    {product.image && <img src={`http://localhost:5000/uploads/${product.image}`} alt={product.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />}
+                  </TableCell>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{getCategoryNameById(product.category)}</TableCell>
+                  <TableCell>{product.quantity}</TableCell>
+                  <TableCell>{product.price}</TableCell>
+                  <TableCell>
+                    <IconButton color="primary" onClick={() => handleDialogOpen({ id: product._id, name: product.name, category: product.category._id, quantity: product.quantity, price: product.price, description: product.description, image: null })}><EditIcon /></IconButton>
+                    <IconButton color="error" onClick={() => handleDeleteProduct(product._id)}><DeleteIcon /></IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
         </Table>
       </TableContainer>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+        />
+      </Box>
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>{isEditMode ? 'Edit Product' : 'Add Product'}</DialogTitle>
         <DialogContent>
@@ -228,7 +252,7 @@ const Products = () => {
             fullWidth
             sx={{ mt: 2 }}
           >
-            Upload Image
+            {currentProduct.image ? 'Image Uploaded' : 'Upload Image'}
             <input
               type="file"
               accept="image/*"

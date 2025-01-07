@@ -61,11 +61,11 @@ const Categories = () => {
 
       if (response.ok) {
         toast.success(isEditMode ? `Category updated successfully!` : `Category added successfully!`);
+        fetchCategories();
+        handleDialogClose();
       } else {
-        toast.error(data.message || 'Error saving category.');
+        toast.error(data.message || 'All fields are ');
       }
-      fetchCategories();
-      handleDialogClose();
     } catch (error) {
       toast.error('Error saving category.');
     }
@@ -95,14 +95,14 @@ const Categories = () => {
   return (
     <Box sx={{ p: 3, maxWidth: '800px', margin: '0 auto' }}>
       <Typography variant="h3" sx={{ textAlign: 'center', mb: 3, fontWeight: 'bold' }}>Categories</Typography>
-      <Button
+      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}><Button
         variant="contained"
         color="primary"
         onClick={() => handleDialogOpen()}
         sx={{ mb: 3, display: 'block' }}
       >
         Add Category
-      </Button>
+      </Button></Box>
       <TableContainer component={Paper} elevation={4}>
         <Table>
           <TableHead>

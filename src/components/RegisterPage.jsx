@@ -1,39 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Container, Typography, Box, Link, Card, CardContent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (localStorage.getItem('token')) {
-            navigate('/dashboard')
+            navigate('/dashboard');
         }
-    }, [navigate])
+    }, [navigate]);
 
-    const handleRegister = async () => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
         if (!email) {
-            toast.error('Enter the email')
+            toast.error('Enter the email');
             return;
         }
         if (!password) {
-            toast.error('Enter the password')
+            toast.error('Enter the password');
             return;
         }
         if (!confirmPassword) {
-            toast.error('Enter the ConfirmPassword')
+            toast.error('Enter the Confirm Password');
             return;
         }
         if (password !== confirmPassword) {
-            toast.error('ConfirmPassword should be same as Password')
+            toast.error('Confirm Password should be same as Password');
             return;
         }
 
+        setIsLoading(true);
         try {
             const res = await fetch('http://localhost:5000/api/auth/register', {
                 method: 'POST',
@@ -41,32 +43,83 @@ const RegisterPage = () => {
                 body: JSON.stringify({ email, password }),
             });
             if (res.ok) {
-                console.log(res.statusText);
-                toast.success(`User Registered Successfully`)
+                toast.success('User Registered Successfully');
                 setTimeout(() => {
-                    navigate('/')
+                    navigate('/');
                 }, 2000);
             } else {
-                const errorData = await res.json()
+                const errorData = await res.json();
                 toast.error(errorData.error);
             }
         } catch (error) {
             toast.error("Network error, please try again later.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
         <Container maxWidth="sm">
-            <Box display='flex' justifyContent='center' alignItems= 'center' minHeight='100vh'>
-                <Card sx={{padding: 5, boxShadow: 20, borderRadius: 3, textAlign: 'center'}}>
-                    <CardContent>
-                        <Typography variant="h4">Register</Typography>
-                        <TextField fullWidth margin="normal" label="Email" value={email} onChange={e => setEmail(e.target.value)} />
-                        <TextField fullWidth margin="normal" label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-                        <TextField fullWidth margin="normal" label="Confirm Password" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
-                        <Button variant="contained" fullWidth onClick={handleRegister}>Register</Button>
-                        <Typography mt={2}>
-                            Already have an account? <Link href="/">Login</Link>
+            <Box
+                sx={{
+                    background: 'linear-gradient(to bottom right, #6366F1, #A855F7)',
+                    padding: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "90vh",
+                }}
+            >
+                <Card sx={{ width: '100%', maxWidth: '400px', borderRadius: 2 }}>
+                    <CardContent sx={{ padding: 4 }}>
+                        <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
+                            Create an account
+                        </Typography>
+                        <Typography variant="body2" gutterBottom align="center" color="textSecondary">
+                            Enter your email and password to register
+                        </Typography>
+                        <form onSubmit={handleRegister}>
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Email"
+                                variant="outlined"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Password"
+                                type="password"
+                                variant="outlined"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Confirm Password"
+                                type="password"
+                                variant="outlined"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                            />
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                type="submit"
+                                disabled={isLoading}
+                                sx={{ mt: 2, mb: 2, height: '48px' }}
+                            >
+                                {isLoading ? 'Registering...' : 'Register'}
+                            </Button>
+                        </form>
+                        <Typography align="center">
+                            Already have an account?{' '}
+                            <Link href="/" underline="hover">
+                                Login
+                            </Link>
                         </Typography>
                     </CardContent>
                 </Card>
