@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Table, TableBody, TableCell, FormControl,
-  TableContainer, TableHead, TableRow, Paper, Typography, Select, MenuItem, Pagination
+  TableContainer, TableHead, TableRow, Paper, Typography, Select, MenuItem, Pagination,
+  useMediaQuery
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -22,6 +23,8 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showLowStock, setShowLowStock] = useState(false);
+
+  const isMobile = useMediaQuery('(max-width:600px)');
 
   const fetchProducts = async (resetPage = false) => {
     try {
@@ -161,8 +164,8 @@ const Products = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: '1000px', margin: '0 auto' }}>
-      <Typography variant="h3" sx={{ textAlign: 'center', mb: 3 }}>Products</Typography>
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+      <Typography variant={isMobile ? 'h5' : 'h3'} sx={{ textAlign: 'center', mb: 3 }}>Products</Typography>
+      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexDirection: isMobile ? 'column' : 'row' }}>
         <Select
           value={selectedCategory}
           onChange={(e) => {

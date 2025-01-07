@@ -72,6 +72,9 @@ const Categories = () => {
   };
 
   const handleDeleteCategory = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this category? All associated products will also be deleted.')) {
+      return;
+    }
     try {
       const response = await fetch(`http://localhost:5000/api/categories/${id}`, {
         method: 'DELETE',
@@ -82,7 +85,7 @@ const Categories = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Category deleted successfully!');
+        toast.success('Category with associate products deleted successfully!');
       } else {
         toast.error(data.error || 'Error deleting category.');
       }
