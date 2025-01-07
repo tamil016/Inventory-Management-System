@@ -11,6 +11,6 @@ const categorySchema = new mongoose.Schema({
         type: String,
         maxlength: [300, 'Description cannot exceed 300 characters'],
     },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Category', categorySchema);
