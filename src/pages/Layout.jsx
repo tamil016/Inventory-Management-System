@@ -15,7 +15,7 @@ const Layout = () => {
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
-    const isMobile = useMediaQuery('(max-width:700px)');
+    const isMobile = useMediaQuery('(max-width:750px)');
     const drawerWidthDynamic = isMobile ? drawerWidthCollapsed : drawerWidth;
 
     const menuItems = [

@@ -163,9 +163,15 @@ const Products = () => {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: '1000px', margin: '0 auto' }}>
-      <Typography variant={isMobile ? 'h5' : 'h3'} sx={{ textAlign: 'center', mb: 3 }}>Products</Typography>
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexDirection: isMobile ? 'column' : 'row' }}>
+    <Box sx={{ p: isMobile ? 2 : 3, maxWidth: '100%', margin: '0 auto' }}>
+      <Typography variant={isMobile ? 'h5' : 'h3'}
+    sx={{ textAlign: 'center', mb: isMobile ? 2 : 3 }}>Products</Typography>
+      <Box sx={{
+      display: 'flex',
+      gap: isMobile ? 1 : 2,
+      mb: isMobile ? 2 : 3,
+      flexDirection: isMobile ? 'column' : 'row',
+    }}>
         <Select
           value={selectedCategory}
           onChange={(e) => {
@@ -190,11 +196,19 @@ const Products = () => {
           fullWidth
         />
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap:'20px' }}>
+      <Box sx={{
+      display: 'flex',
+      flexDirection: isMobile ? 'column' : 'row',
+      gap: 1,
+      justifyContent: isMobile ? 'center' : 'flex-end',
+    }}>
         <Button variant="contained" color="primary" onClick={toggleLowStock}>{showLowStock ? 'View All Products' : 'View Low Stock'}</Button>
         <Button variant="contained" color="primary" onClick={() => handleDialogOpen()}>Add Product</Button>
       </Box>
-      <TableContainer component={Paper} sx={{ mt: 3 }}>
+      <TableContainer component={Paper} sx={{
+      mt: 3,
+      overflowX: isMobile ? 'auto' : 'visible',
+    }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -231,12 +245,18 @@ const Products = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+      <Box sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      mt: 3,
+      px: isMobile ? 1 : 3,
+    }}>
         <Pagination
           count={totalPages}
           page={currentPage}
           onChange={handlePageChange}
           color="primary"
+          size={isMobile ? 'small' : 'medium'}
         />
       </Box>
       <Dialog open={openDialog} onClose={handleDialogClose}>
