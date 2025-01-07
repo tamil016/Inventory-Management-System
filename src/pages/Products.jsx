@@ -212,18 +212,16 @@ const Products = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Image</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>
-                Category
-              </TableCell>
-              <TableCell onClick={() => handleSort('quantity')} style={{ cursor: 'pointer' }}>
+              <TableCell sx={{fontWeight: 'bold', fontSize:'18px'}}>Image</TableCell>
+              <TableCell sx={{fontWeight: 'bold', fontSize:'18px'}}>Name</TableCell>
+              <TableCell sx={{fontWeight: 'bold', fontSize:'18px'}}>Category</TableCell>
+              <TableCell sx={{fontWeight: 'bold', fontSize:'18px'}} onClick={() => handleSort('quantity')} style={{ cursor: 'pointer' }}>
                 Quantity {sortConfig.field === 'quantity' && (sortConfig.order === 'asc' ? '↑' : '↓')}
               </TableCell>
-              <TableCell onClick={() => handleSort('price')} style={{ cursor: 'pointer' }}>
+              <TableCell sx={{fontWeight: 'bold', fontSize:'18px'}} onClick={() => handleSort('price')} style={{ cursor: 'pointer' }}>
                 Price {sortConfig.field === 'price' && (sortConfig.order === 'asc' ? '↑' : '↓')}
               </TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell sx={{fontWeight: 'bold', fontSize:'18px'}}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
