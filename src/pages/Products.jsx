@@ -93,6 +93,9 @@ const Products = () => {
   };
 
   const handleSaveProduct = async () => {
+    if(!currentProduct.name || !currentProduct.category || !currentProduct.quantity || !currentProduct.price || !currentProduct.description){
+      toast.error('All fields are required')
+    }
     if (!currentProduct.name.trim()) {
       toast.error('Product name is required.');
       return;
