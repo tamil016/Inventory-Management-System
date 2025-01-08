@@ -45,6 +45,18 @@ const Categories = () => {
   };
 
   const handleSaveCategory = async () => {
+    if(!currentCategory.name && !currentCategory.description){
+      toast.error('All fields are required')
+      return
+    }
+    if(!currentCategory.name){
+      toast.error('Name is required')
+      return
+    }
+    if(!currentCategory.description){
+      toast.error('Description is required')
+      return
+    }
     const method = isEditMode ? 'PUT' : 'POST';
     const url = isEditMode ? `http://localhost:5000/api/categories/${currentCategory.id}` : 'http://localhost:5000/api/categories';
 

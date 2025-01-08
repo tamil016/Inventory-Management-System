@@ -8,6 +8,8 @@ const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,12 +20,20 @@ const LoginPage = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setEmailError('');
+        setPasswordError('');
+
+        let isValid = true;
         if (!email) {
-            toast.error('Enter the email');
-            return;
+            setEmailError('Enter the email');
+            isValid = false;
         }
         if (!password) {
-            toast.error('Enter the password');
+            setPasswordError('Enter the password');
+            isValid = false;
+        }
+
+        if (!isValid) {
             return;
         }
 
@@ -81,6 +91,8 @@ const LoginPage = () => {
                                 variant="outlined"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                error={!!emailError}
+                                helperText={emailError}
                             />
                             <TextField
                                 fullWidth
@@ -90,6 +102,8 @@ const LoginPage = () => {
                                 variant="outlined"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                error={!!passwordError}
+                                helperText={passwordError}
                             />
                             <Button
                                 variant="contained"

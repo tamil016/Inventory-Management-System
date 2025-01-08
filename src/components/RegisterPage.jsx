@@ -8,6 +8,9 @@ const RegisterPage = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [emailError, setEmailError] = useState('')
+    const [passwordError, setPasswordError] = useState('')
+    const [confirmPasswordError, setConfirmPasswordError] = useState('')
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,20 +21,30 @@ const RegisterPage = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setEmailError('')
+        setPasswordError('')
+        setConfirmPasswordError('')
+         
+        let isValid = true
+
         if (!email) {
-            toast.error('Enter the email');
-            return;
+            setEmailError('Enter the email');
+            isValid = false;
         }
         if (!password) {
-            toast.error('Enter the password');
-            return;
+            setPasswordError('Enter the password')
+            isValid = false
         }
         if (!confirmPassword) {
-            toast.error('Enter the Confirm Password');
-            return;
+            setConfirmPasswordError('Enter the confirmpassword')
+            isValid = false
         }
-        if (password !== confirmPassword) {
-            toast.error('Confirm Password should be same as Password');
+        else if (password !== confirmPassword) {
+            setConfirmPasswordError('Confirmpassword should be same as password')
+            isValid = false
+        }
+
+        if(!isValid){
             return;
         }
 
@@ -86,6 +99,8 @@ const RegisterPage = () => {
                                 variant="outlined"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                error = {!!emailError}
+                                helperText={emailError}
                             />
                             <TextField
                                 fullWidth
@@ -95,6 +110,8 @@ const RegisterPage = () => {
                                 variant="outlined"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                error={!!passwordError}
+                                helperText={passwordError}
                             />
                             <TextField
                                 fullWidth
@@ -104,6 +121,8 @@ const RegisterPage = () => {
                                 variant="outlined"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
+                                error={!!confirmPasswordError}
+                                helperText={confirmPasswordError}
                             />
                             <Button
                                 variant="contained"
