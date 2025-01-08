@@ -93,6 +93,34 @@ const Products = () => {
   };
 
   const handleSaveProduct = async () => {
+    if (!currentProduct.name.trim()) {
+      toast.error('Product name is required.');
+      return;
+    }
+    if (!currentProduct.category) {
+      toast.error('Please select a category.');
+      return;
+    }
+    if (!currentProduct.quantity) {
+      toast.error('Quantity is required.');
+      return;
+    }
+    if (isNaN(currentProduct.quantity) || currentProduct.quantity <= 0) {
+      toast.error('Quantity must be a positive number.');
+      return;
+    }
+    if (!currentProduct.price) {
+      toast.error('Price is required.');
+      return;
+    }
+    if (isNaN(currentProduct.price) || currentProduct.price <= 0) {
+      toast.error('Price must be a positive number.');
+      return;
+    }
+    if (!currentProduct.description.trim()) {
+      toast.error('Description is required.');
+      return;
+    }
     const method = isEditMode ? 'PUT' : 'POST';
     const url = isEditMode ? `http://localhost:5000/api/products/${currentProduct.id}` : `http://localhost:5000/api/products`;
 
@@ -120,7 +148,7 @@ const Products = () => {
         fetchProducts();
         handleDialogClose();
       } else {
-        toast.error('All fields are required');
+        toast.error('Error saving product.');
       }
     } catch (error) {
       toast.error('Error saving product.');
